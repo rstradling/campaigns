@@ -16,7 +16,7 @@ spec:
         "kubernetes.io/os": linux
       containers:
       - name: campaigns 
-        image: campaigns.azurecr.io/campaigns:1.0.0
+        image: campaignsacr.azurecr.io/campaigns:latest
         ports:
         - containerPort: 3000
         env:
