@@ -15,7 +15,7 @@ repoGet :: DModels.TaskId -> IO DModels.Task
 repoGet _ =
   return
     DModels.Task
-      { taskId = 32,
+      { taskId = DModels.TaskId 32,
         taskName = "foo",
         taskOwner = "bar",
         taskComplete = False

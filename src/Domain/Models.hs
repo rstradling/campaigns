@@ -1,4 +1,5 @@
 {-# LANGUAGE DataKinds #-}
+{-# LANGUAGE DeriveAnyClass #-}
 {-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE StandaloneDeriving #-}
 {-# LANGUAGE TemplateHaskell #-}
@@ -13,11 +14,12 @@ where
 import Data.Aeson
 import Data.Aeson.TH
 import Data.Int (Int64)
+import GHC.Generics
 
-newtype TaskId = TaskId Int64 deriving (Eq, Show)
+newtype TaskId = TaskId Int64 deriving (Eq, Show, Generic, ToJSON, FromJSON)
 
 data Task = Task
-  { taskId :: Int64,
+  { taskId :: TaskId,
     taskName :: String,
     taskOwner :: String,
     taskComplete :: Bool
