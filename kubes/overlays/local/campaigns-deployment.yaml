@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: campaigns 
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: campaigns 
+  template:
+    metadata:
+      labels:
+        app: campaigns 
+    spec:
+      containers:
+      - name: campaigns 
+        image: campaigns:latest
+        imagePullPolicy: Never 
+        ports:
+        - containerPort: 3000
+        envFrom:
+          - configMapRef:
+              name: postgres-config
+        resources:
+          requests:
+            cpu: 1m
+            memory: 50Mi
+          limits:
+            cpu: 75m
+            memory: 128Mi
+        startupProbe:
+          httpGet:
+            path: /health
+            port: 3000
+          failureThreshold: 5
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 3000
+          failureThreshold: 3
+          initialDelaySeconds: 3
+          periodSeconds: 5
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 3000
+          failureThreshold: 5
+          initialDelaySeconds: 3
+          periodSeconds: 3

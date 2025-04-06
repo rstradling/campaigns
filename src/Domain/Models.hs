@@ -22,7 +22,7 @@ data Task = Task
   { taskId :: TaskId,
     taskName :: String,
     taskOwner :: String,
-    taskComplete :: Bool
+    taskCompleted :: Bool
   }
   deriving (Eq, Show)
 

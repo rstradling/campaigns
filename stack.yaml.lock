@@ -3,10 +3,24 @@
 # For more information, please see the documentation at:
 #   https://docs.haskellstack.org/en/stable/topics/lock_files
 
-packages: []
+packages:
+- completed:
+    hackage: beam-core-0.10.3.1@sha256:5dd5985423572523b931a39579237180142ab02454359862fb3a6108534418dc,5291
+    pantry-tree:
+      sha256: 4940c994e2766feeff17903d75555b848996b076687aea5370c43c526c11b72b
+      size: 2705
+  original:
+    hackage: beam-core-0.10.3.1
+- completed:
+    hackage: beam-postgres-0.5.4.2@sha256:f8dad0d4d208b941af81ebf0ffaf1173af707e47f9bc5ec921b388f68bc771b6,4394
+    pantry-tree:
+      sha256: b87d68439aa1f0afa582131bbabbcf894e57e70d7f0fddbdaf689804967ad0ff
+      size: 1694
+  original:
+    hackage: beam-postgres-0.5.4.2
 snapshots:
 - completed:
-    sha256: a81fb3877c4f9031e1325eb3935122e608d80715dc16b586eb11ddbff8671ecd
-    size: 640086
-    url: https://raw.githubusercontent.com/commercialhaskell/stackage-snapshots/master/lts/21/25.yaml
-  original: lts-21.25
+    sha256: 2763632e4c4094ce12f5ae12b22f524cdc6453b6b19007ff164a37fd9d2ea829
+    size: 683819
+    url: https://raw.githubusercontent.com/commercialhaskell/stackage-snapshots/master/lts/23/17.yaml
+  original: lts-23.17

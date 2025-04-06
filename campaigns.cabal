@@ -37,6 +37,8 @@ library
   build-depends:
       aeson
     , base >=4.7 && <5
+    , beam-core
+    , beam-postgres
     , servant-server
     , time
     , wai
@@ -55,6 +57,8 @@ executable campaigns-exe
   build-depends:
       aeson
     , base
+    , beam-core
+    , beam-postgres
     , campaigns
     , servant-server
     , time
@@ -75,6 +79,8 @@ test-suite campaigns-test
   build-depends:
       aeson
     , base
+    , beam-core
+    , beam-postgres
     , campaigns
     , hspec
     , hspec-wai

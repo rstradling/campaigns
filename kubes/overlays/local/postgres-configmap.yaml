@@ -1,0 +1,17 @@
+# Only use for local testing
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: postgres-config
+  labels:
+    app: postgres
+data:
+  POSTGRES_DB: campaigns_local 
+  POSTGRES_USER: postgres
+  POSTGRES_PASSWORD: postgres
+  DB_TYPE: postgresql
+  DB_NAME: campaigns_local
+  DB_HOST: localhost
+  DB_PORT: "5432"
+  DB_USER: postgres
+  DB_PASSWORD: postgres 

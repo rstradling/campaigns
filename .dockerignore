@@ -1,0 +1,46 @@
+# Haskell build artifacts
+.stack-work/
+dist/
+dist-newstyle/
+.cabal-sandbox/
+cabal.sandbox.config
+*.hi
+*.o
+*.dyn_hi
+*.dyn_o
+
+# Docker artifacts
+.docker/
+docker-compose*.yml
+Dockerfile*
+!Dockerfile
+
+# Editor and IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Git related
+.git/
+.gitignore
+.github/
+
+# Other common exclusions
+node_modules/
+*.log
+*.md
+!README.md
+tmp/
+logs/
+.env*
+*.lock
+# Except the ones used by your build tool
+!stack.yaml.lock
+!cabal.project.freeze
+
+# Test directories/files
+tests/
+test-results/

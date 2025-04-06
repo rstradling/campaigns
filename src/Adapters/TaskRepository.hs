@@ -4,37 +4,38 @@ module Adapters.TaskRepository
   )
 where
 
+import Database.Beam.Postgres (Connection)
 import Domain.Models as DModels
 import Domain.Ports as Ports
 
-repoSave :: DModels.Task -> IO ()
-repoSave _ =
+repoSave :: Connection -> DModels.Task -> IO ()
+repoSave _ _ =
   return ()
 
-repoGet :: DModels.TaskId -> IO DModels.Task
-repoGet _ =
+repoGet :: Connection -> DModels.TaskId -> IO DModels.Task
+repoGet _ _ =
   return
     DModels.Task
       { taskId = DModels.TaskId 32,
         taskName = "foo",
         taskOwner = "bar",
-        taskComplete = False
+        taskCompleted = False
       }
 
-repoDelete :: DModels.TaskId -> IO ()
-repoDelete _ =
+repoDelete :: Connection -> DModels.TaskId -> IO ()
+repoDelete _ _ =
   return ()
 
-repoGetAll :: () -> IO [DModels.Task]
-repoGetAll _ =
+repoGetAll :: Connection -> () -> IO [DModels.Task]
+repoGetAll _ _ =
   return []
 
-createRepoInstance :: IO Ports.TaskRepository
-createRepoInstance = do
+createRepoInstance :: Connection -> IO Ports.TaskRepository
+createRepoInstance conn = do
   return
     Ports.TaskRepository
-      { save = repoSave,
-        get = repoGet,
-        delete = repoDelete,
-        getAll = repoGetAll
+      { save = repoSave conn,
+        get = repoGet conn,
+        delete = repoDelete conn,
+        getAll = repoGetAll conn
       }

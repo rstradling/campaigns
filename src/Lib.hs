@@ -1,5 +1,6 @@
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE StandaloneDeriving #-}
 {-# LANGUAGE TemplateHaskell #-}
 {-# LANGUAGE TypeOperators #-}
@@ -11,7 +12,8 @@ module Lib
 where
 
 import Adapters.TaskRepository (createRepoInstance, getAll)
-import Control.Monad.IO.Class (liftIO)
+import Database.Beam
+import Database.Beam.Postgres (connectPostgreSQL)
 import Domain.Models (Task)
 import Network.Wai
 import Network.Wai.Handler.Warp
@@ -31,5 +33,6 @@ api = Proxy
 
 server :: Server API
 server = do
-  repo <- liftIO createRepoInstance
+  conn <- liftIO $ connectPostgreSQL "host=localhost port=30432 dbname=campaigns_local user=postgres password=postgres"
+  repo <- liftIO $ createRepoInstance conn
   liftIO $ getAll repo ()

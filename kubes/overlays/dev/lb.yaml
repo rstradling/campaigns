@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: lb-campaigns  # Add this name section
+  annotations:
+    service.beta.kubernetes.io/azure-load-balancer-resource-group: campaigns 
+spec:
+  ports:
+  - port: 80
+    targetPort: 3000 
+  selector:
+    app: campaigns
+  type: LoadBalancer
