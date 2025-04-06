@@ -25,6 +25,7 @@ dependencies:
 - beam-core
 - beam-postgres
 - servant-server
+- text
 - time
 - wai
 - warp

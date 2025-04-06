@@ -11,7 +11,7 @@ module Lib
   )
 where
 
-import Adapters.TaskRepository (createRepoInstance, getAll)
+import Adapters.TaskRepository (createRepoInstance, taskRepositoryGetAll)
 import Database.Beam
 import Database.Beam.Postgres (connectPostgreSQL)
 import Domain.Models (Task)
@@ -33,6 +33,6 @@ api = Proxy
 
 server :: Server API
 server = do
-  conn <- liftIO $ connectPostgreSQL "host=localhost port=30432 dbname=campaigns_local user=postgres password=postgres"
+  conn <- liftIO $ connectPostgreSQL "postgresql://postgres:postgres@127.0.0.1:30432/campaigns_local"
   repo <- liftIO $ createRepoInstance conn
-  liftIO $ getAll repo ()
+  liftIO $ taskRepositoryGetAll repo

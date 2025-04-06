@@ -56,7 +56,7 @@ extra-deps:
 #
 # Require a specific version of Stack, using version ranges
 # require-stack-version: -any # Default
-require-stack-version: ">=3.5"
+require-stack-version: ">=3.3"
 #
 # Override the architecture used by Stack, especially useful on Windows
 # arch: i386

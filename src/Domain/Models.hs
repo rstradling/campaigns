@@ -13,15 +13,16 @@ where
 
 import Data.Aeson
 import Data.Aeson.TH
-import Data.Int (Int64)
+import Data.Text (Text)
 import GHC.Generics
+import GHC.Int (Int64)
 
 newtype TaskId = TaskId Int64 deriving (Eq, Show, Generic, ToJSON, FromJSON)
 
 data Task = Task
   { taskId :: TaskId,
-    taskName :: String,
-    taskOwner :: String,
+    taskName :: Text,
+    taskOwner :: Text,
     taskCompleted :: Bool
   }
   deriving (Eq, Show)

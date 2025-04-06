@@ -6,8 +6,8 @@ where
 import Domain.Models as Domain
 
 data TaskRepository = TaskRepository
-  { save :: Domain.Task -> IO (),
-    get :: Domain.TaskId -> IO Domain.Task,
-    delete :: Domain.TaskId -> IO (),
-    getAll :: () -> IO [Domain.Task]
+  { taskRepositorySave :: Domain.Task -> IO (),
+    taskRepositoryGet :: Domain.TaskId -> IO Domain.Task,
+    taskRepositoryDelete :: Domain.TaskId -> IO (),
+    taskRepositoryGetAll :: IO [Domain.Task]
   }
