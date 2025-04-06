@@ -52,5 +52,4 @@ WORKDIR /app
 
 COPY --from=build /app/.stack-work/dist/*/ghc-9.8.4/build/campaigns-exe/* /app/
 
-RUN ls -al /app/
 ENTRYPOINT ["/app/campaigns-exe"]
