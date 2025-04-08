@@ -25,21 +25,29 @@ source-repository head
 
 library
   exposed-modules:
-      Adapters.TaskEndpoint
+      Adapters.TaskRepository
       Lib
   other-modules:
       Domain.Models
       Domain.Ports
-      Adapters.TaskRepository
   hs-source-dirs:
       src
+  default-extensions:
+      NoImplicitPrelude
+      OverloadedStrings
+      DeriveGeneric
+      DataKinds
+      TypeApplications
   ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints
   build-depends:
       aeson
     , base >=4.7 && <5
     , beam-core
     , beam-postgres
-    , servant-server
+    , bytestring
+    , http-types
+    , rio
+    , scotty
     , text
     , time
     , wai
@@ -60,8 +68,11 @@ executable campaigns-exe
     , base
     , beam-core
     , beam-postgres
+    , bytestring
     , campaigns
-    , servant-server
+    , http-types
+    , rio
+    , scotty
     , text
     , time
     , wai
@@ -83,11 +94,14 @@ test-suite campaigns-test
     , base
     , beam-core
     , beam-postgres
+    , bytestring
     , campaigns
     , hspec
     , hspec-wai
     , hspec-wai-json
-    , servant-server
+    , http-types
+    , rio
+    , scotty
     , text
     , time
     , wai

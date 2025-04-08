@@ -1,27 +1,23 @@
 {-# LANGUAGE DeriveAnyClass #-}
-{-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE GADTs #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
-{-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE StandaloneDeriving #-}
-{-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE TypeFamilies #-}
-{-# LANGUAGE TypeSynonymInstances #-}
 
 module Adapters.TaskRepository
   ( createRepoInstance,
     taskRepositoryGetAll,
+    taskRepositoryGet,
   )
 where
 
-import Data.Text (Text)
 import Database.Beam
 import Database.Beam.Postgres
 import Domain.Models as DModels
 import Domain.Ports as Ports
-import GHC.Int (Int64)
+import RIO
 
 data DbTaskT f
   = DbTaskT
@@ -41,8 +37,6 @@ instance Table DbTaskT where
 
 type DbTask = DbTaskT Identity
 
-type DbTaskId = PrimaryKey DbTaskT Identity
-
 deriving instance Show DbTask
 
 deriving instance Eq DbTask
@@ -60,15 +54,15 @@ repoSave :: Connection -> DModels.Task -> IO ()
 repoSave _ _ =
   return ()
 
-repoGet :: Connection -> DModels.TaskId -> IO DModels.Task
-repoGet _ _ =
-  return
-    DModels.Task
-      { taskId = DModels.TaskId 32,
-        taskName = "foo",
-        taskOwner = "bar",
-        taskCompleted = False
-      }
+repoGet :: Connection -> Int64 -> IO (Maybe DModels.Task)
+repoGet con taskIdentifier = do
+  result <- runBeamPostgres con $ runSelectReturningList $ select $ do
+    task <- all_ (_campaignTasks campaignsDb)
+    guard_ (_dbTaskId task ==. val_ taskIdentifier)
+    return task
+  return $ case result of
+    (dbTask : _) -> Just $ dbTaskToDomainTask dbTask
+    [] -> Nothing
 
 repoDelete :: Connection -> DModels.TaskId -> IO ()
 repoDelete _ _ =

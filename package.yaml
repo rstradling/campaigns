@@ -19,12 +19,16 @@ extra-source-files:
 # common to point users to the README.md file.
 description:         Please see the README on GitHub at <https://github.com/githubuser/campaigns#readme>
 
+
 dependencies:
 - base >= 4.7 && < 5
 - aeson
 - beam-core
 - beam-postgres
-- servant-server
+- bytestring
+- http-types
+- scotty
+- rio
 - text
 - time
 - wai
@@ -46,7 +50,17 @@ library:
   other-modules: 
   - Domain.Models
   - Domain.Ports
+  exposed-modules:
   - Adapters.TaskRepository
+  - Lib
+
+  default-extensions:
+  - NoImplicitPrelude
+  - OverloadedStrings
+  - DeriveGeneric
+  - DataKinds
+  - TypeApplications
+
 
 executables:
   campaigns-exe:

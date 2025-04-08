@@ -1,38 +1,36 @@
-{-# LANGUAGE DataKinds #-}
-{-# LANGUAGE DeriveGeneric #-}
-{-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE StandaloneDeriving #-}
-{-# LANGUAGE TemplateHaskell #-}
-{-# LANGUAGE TypeOperators #-}
-
 module Lib
-  ( startApp,
-    app,
+  ( routes,
+    pgConnect,
   )
 where
 
-import Adapters.TaskRepository (createRepoInstance, taskRepositoryGetAll)
+import Data.Aeson (KeyValue ((.=)), object)
 import Database.Beam
-import Database.Beam.Postgres (connectPostgreSQL)
+import Database.Beam.Postgres (Connection, connectPostgreSQL)
 import Domain.Models (Task)
-import Network.Wai
-import Network.Wai.Handler.Warp
-import Servant
-import Prelude
+import Domain.Ports (TaskRepository (taskRepositoryGet, taskRepositoryGetAll))
+import Network.HTTP.Types.Status (status404)
+import RIO
+import Web.Scotty
 
-type API = "tasks" :> Get '[JSON] [Task]
+routes :: Domain.Ports.TaskRepository -> IO ()
+routes repo = scotty 8080 $ do
+  get "/api/v1/tasks/:id" $ do
+    taskId <- pathParam "id"
+    task <- liftIO $ taskRepositoryGet repo taskId
+    viewTask task
+  get "/api/v1/tasks/" $ do
+    tasks <- liftIO $ taskRepositoryGetAll repo
+    tasksList tasks
 
-startApp :: IO ()
-startApp = run 8080 app
+pgConnect :: ByteString -> IO Connection
+pgConnect url = connectPostgreSQL url
 
-app :: Application
-app = serve api server
+tasksList :: [Task] -> ActionM ()
+tasksList = json
 
-api :: Proxy API
-api = Proxy
-
-server :: Server API
-server = do
-  conn <- liftIO $ connectPostgreSQL "postgresql://postgres:postgres@127.0.0.1:30432/campaigns_local"
-  repo <- liftIO $ createRepoInstance conn
-  liftIO $ taskRepositoryGetAll repo
+viewTask :: Maybe Task -> ActionM ()
+viewTask Nothing = do
+  status status404
+  json $ object ["error" .= ("Task not found" :: String)]
+viewTask (Just task) = json task
