@@ -1,21 +1,18 @@
 {-# LANGUAGE DeriveAnyClass #-}
 {-# LANGUAGE StandaloneDeriving #-}
 
-module Domain.Models
-  ( Task (..),
-    TaskId (..),
-    getTaskIdValue,
-  )
-where
+module Feature.Task.Types where
 
 import Data.Aeson
-import GHC.Generics
-import RIO (Bool, Eq, Int64, Show, Text)
+import RIO
 
 newtype TaskId = TaskId Int64 deriving (Eq, Show, Generic, ToJSON, FromJSON)
 
-getTaskIdValue :: TaskId -> Int64
-getTaskIdValue (TaskId i) = i
+getTaskId :: TaskId -> Int64
+getTaskId (TaskId i) = i
+
+createTaskId :: Int64 -> TaskId
+createTaskId = TaskId
 
 data Task = Task
   { taskId :: TaskId,
@@ -24,3 +21,5 @@ data Task = Task
     taskCompleted :: Bool
   }
   deriving (Eq, Show, Generic, ToJSON, FromJSON)
+
+data TaskError = TaskErrorNotFound TaskId

@@ -4,33 +4,51 @@ module Lib
   )
 where
 
+import Adapters.TaskRepository (CrudRepository (..))
 import Data.Aeson (KeyValue ((.=)), object)
 import Database.Beam
 import Database.Beam.Postgres (Connection, connectPostgreSQL)
-import Domain.Models (Task)
-import Domain.Ports (TaskRepository (taskRepositoryGet, taskRepositoryGetAll))
+import Domain.Models.Feature.Task (Task, createTaskId)
+import qualified Feature.Task.Http as TaskHttp
+import qualified Feature.Task.PG as TaskPG
+import qualified Feature.Task.Service as TaskService
 import Network.HTTP.Types.Status (status404)
 import RIO
 import Web.Scotty
 
-routes :: Domain.Ports.TaskRepository -> IO ()
-routes repo = scotty 8080 $ do
-  get "/api/v1/tasks/:id" $ do
-    taskId <- pathParam "id"
-    task <- liftIO $ taskRepositoryGet repo taskId
-    viewTask task
-  get "/api/v1/tasks/" $ do
-    tasks <- liftIO $ taskRepositoryGetAll repo
-    tasksList tasks
+type Env = PG.Env
 
-pgConnect :: ByteString -> IO Connection
-pgConnect url = connectPostgreSQL url
+main :: IO ()
+main = do
+  -- acquire resources
+  pgEnv <- PG.init
+  -- start the app
+  let runner app = flip runReaderT pgEnv $ unAppT app
+  Http.main runner
 
-tasksList :: [Task] -> ActionM ()
-tasksList = json
+type Env = PG.Env
 
-viewTask :: Maybe Task -> ActionM ()
-viewTask Nothing = do
-  status status404
-  json $ object ["error" .= ("Task not found" :: String)]
-viewTask (Just task) = json task
+newtype AppT a = AppT
+  { unAppT :: ReaderT Env IO a
+  }
+  deriving
+    ( Applicative,
+      Functor,
+      Monad,
+      MonadIO,
+      MonadReader Env
+    )
+
+instance TaskHttp.TaskService AppT where
+  getUser = TaskService.getUser
+  deleteUser = TaskService.deleteUser
+  getAll = TaskService.getAll
+  update = TaskService.update
+  create = TaskService.create
+
+instance TaskService.TaskRepo AppT where
+  getUser = TaskPG.getUser
+  deleteUser = TaskPG.deleteUser
+  getAll = TaskPG.getAll
+  update = TaskPG.update
+  create = TaskPG.create
