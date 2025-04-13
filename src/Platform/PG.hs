@@ -1,14 +1,12 @@
 module Platform.PG where
 
-import RIO(Pool)
-import Database.Beam.Postgres (Connection, connectPostgresSQL)
+-- import Data.Pool
+-- import Database.Beam.Postgres (Connection, connectPostgreSQL)
+-- import RIO
 
-type Env = Pool Connection
+-- type Env = Pool Connection
 
--- TODO: Fix this up because rio should have equivalent
-type PG r m = (MonadReader r m, Has Env r, MonadIO m)
-
-init :: IO Env
+{- TODO: FIX ME init :: IO Env
 init = do
   pool <- acquirePool
   migrateDb pool
@@ -25,11 +23,11 @@ migrateDb pool = withResource pool $ \conn ->
   void $ withTransaction conn (runMigration (ctx conn))
   where
     ctx = MigrationContext cmd False
-    cmd = MigrationCommands [MigrationINitializatino, MigrationDirectory "postgresql"]
+    cmd = MigrationCommands [MigrationInitialization, MigrationDirectory "postgresql"]
+    -}
 
-withConn :: PG r m => (Connection -> IO a) -> m a
+{-withConn :: (PG r m) => (Connection -> IO a) -> m a
 withConn action = do
   pool <- asks getter
   liftIO $ withREsource pool action
-
-
+  -}

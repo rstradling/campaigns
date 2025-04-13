@@ -1,32 +1,31 @@
-module Platform.Http
-( main ) where
+module Platform.Http (main) where
 
-import Rio
-import Network.Wai (Response)
-
+import Conferer
+import Network.Wai.Middleware.Cors
+import Network.Wai.Middleware.RequestLogger
+import Platform.App
+import Platform.Config
+import RIO
+import Web.Scotty
 import qualified Feature.Task.Http as Task
 
-type App r m = (User.Service m, MonadIO m)
+runServer :: (MonadReader MyApp m, MonadUnliftIO m) => m ()
+runServer = do
+  env <- ask
+  let MyApp c _ = env
+  liftIO $ scotty (appConfigPort c) $ do
+    middleware logStdoutDev
+    middleware simpleCors
+    get "/search/" $ do
+      json (["hello"] :: [String])
+-- feature routes
+    Task.routes
 
-main :: (App r m) => (m Response -> IO Response) -> IO ()
-main runner = do
-  port <- acquirePort
-  scottyT port runner routes
-  where
-    acquirePort = do
-      port <- fromMaybe "" <$> lookupEnv "PORT"
-      return . fromMaybe 3000 $ readMay port
-
--- * Routing
-routes :: (App r m) => ScottyT LazyText m ()
-routes = do
-  defaultHandler $ \str -> do
-    status status500
-    json str
-
-  -- feature routes
-  Task.routes
-
-  -- health
-  get "/api/health" $
-    json true
+main :: IO ()
+main = do
+  logOptions <- logOptionsHandle stdout True
+  --  processContext <- mkDefaultProcessContext
+  config <- mkMyConfig
+  appConfig :: AppConfig <- Conferer.fetch config
+  withLogFunc logOptions $ \logFunc ->
+    runRIO (MyApp appConfig logFunc) runServer

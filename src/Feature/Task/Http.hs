@@ -1,33 +1,34 @@
 module Feature.Task.Http
   ( routes,
-    Service (..),
   )
 where
 
+import Data.Aeson (object, (.=))
 import Feature.Task.Types
 import Network.HTTP.Types.Status
+import Platform.Services
 import RIO
 import Web.Scotty.Trans
 
-class (Monad m) => Service m where
-  getUser :: Int64 -> m (Maybe DM.Task)
-  deleteUser :: Int64 -> m (Maybe ())
-  getAll :: m [DM.Task]
-  update :: DM.Task -> m (Maybe DM.Task)
-  create :: DM.Task -> m (Maybe DM.Task)
-
-routes :: (Service m, MonadIO m) -> ScottyT LazyText m ()
+routes :: (Service m, MonadUnliftIO m) => ScottyT m ()
 routes = do
   get "/api/v1/tasks/:id" $ do
-    taskId <- pathParam "id"
-    task <- liftIO $ repositoryGet con (createTaskId taskId)
+    identifier <- pathParam "id"
+    task <- lift $ getTask identifier
     viewTask task
   get "/api/v1/tasks/" $ do
-    tasks <- liftIO $ repositoryGetAll con
-    tasksList tasks
+    tasks <- lift getAll
+    json tasks
 
-taskErrorHandler :: (ScottyError e, Monad m) => TaskError -> ActionT e m ()
+viewTask :: (MonadUnliftIO m) => Maybe Task -> ActionT m ()
+viewTask Nothing = do
+  status status404
+  json $ object ["error" .= ("Task not found" :: String)]
+viewTask (Just task) = json task
+
+{-taskErrorHandler :: (ScottyError e, Monad m) => TaskError -> ActionT e m ()
 taskErrorHandler = case err of
-  DM.TaskErrorNotFound _ -> do
+  TaskErrorNotFound _ -> do
     status status404
     json err
+-}

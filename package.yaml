@@ -22,7 +22,6 @@ description:         Please see the README on GitHub at <https://github.com/gith
 default-extensions:
 - OverloadedStrings
 - QuasiQuotes
-- GeneralizedNewtypeDeriving
 - ConstraintKinds
 - FlexibleContexts
 - TemplateHaskell
@@ -37,17 +36,6 @@ dependencies:
 - base >= 4.7 && < 5
 - rio
 
-ghc-options:
-- -Wall
-- -Wcompat
-- -Widentities
-- -Wincomplete-record-updates
-- -Wincomplete-uni-patterns
-- -Wmissing-export-lists
-- -Wmissing-home-modules
-- -Wpartial-fields
-- -Wredundant-constraints
-
 library:
   source-dirs: src
   dependencies:
@@ -55,11 +43,16 @@ library:
   - beam-core
   - beam-postgres
   - bytestring
+  - conferer
   - http-types
+  - mono-traversable
+  - resource-pool
   - scotty
   - text
   - time
   - wai
+  - wai-cors
+  - wai-extra
   - warp
   - template-haskell
   ghc-options:

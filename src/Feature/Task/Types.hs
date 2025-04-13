@@ -22,4 +22,4 @@ data Task = Task
   }
   deriving (Eq, Show, Generic, ToJSON, FromJSON)
 
-data TaskError = TaskErrorNotFound TaskId
+data TaskError = TaskErrorNotFound TaskId deriving (Eq, Show, Generic, ToJSON, FromJSON)

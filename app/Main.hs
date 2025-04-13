@@ -1,9 +1,7 @@
-{-# LANGUAGE OverloadedStrings #-}
-
 module Main where
 
 import qualified Lib
-import Rio
+import RIO
 
 main :: IO ()
 main = Lib.main

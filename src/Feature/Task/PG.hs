@@ -12,7 +12,7 @@ module Feature.Task.PG where
 
 import Database.Beam
 import Database.Beam.Postgres
-import Domain.Models as DModels
+import Feature.Task.Types
 import RIO
 
 data DbTaskT f
@@ -46,13 +46,13 @@ deriving instance Database be CampaignsDb
 campaignsDb :: DatabaseSettings be CampaignsDb
 campaignsDb = defaultDbSettings
 
-repoSave :: Connection -> DModels.Task -> IO ()
+repoSave :: Connection -> Task -> IO ()
 repoSave _ _ =
   return ()
 
-repoGet :: Connection -> DModels.TaskId -> IO (Maybe DModels.Task)
+repoGet :: Connection -> TaskId -> IO (Maybe Task)
 repoGet con taskIdentifier =
-  let id64 = getTaskIdValue taskIdentifier
+  let id64 = getTaskId taskIdentifier
    in do
         result <- runBeamPostgres con $ runSelectReturningList $ select $ do
           task <- all_ (_campaignTasks campaignsDb)
@@ -62,23 +62,23 @@ repoGet con taskIdentifier =
           (dbTask : _) -> Just $ dbTaskToDomainTask dbTask
           [] -> Nothing
 
-repoDelete :: Connection -> Proxy Task -> DModels.TaskId -> IO (Maybe ())
+repoDelete :: Connection -> Proxy Task -> TaskId -> IO (Maybe ())
 repoDelete _ _ _ =
   return Nothing
 
-repoUpdate :: Connection -> DModels.Task -> IO ()
+repoUpdate :: Connection -> Task -> IO ()
 repoUpdate _ _ =
   return ()
 
-repoGetAll :: Connection -> IO [DModels.Task]
+repoGetAll :: Connection -> IO [Task]
 repoGetAll conn = do
   dbTasks <- runBeamPostgres conn $ runSelectReturningList $ select $ all_ (_campaignTasks campaignsDb)
   return $ map dbTaskToDomainTask dbTasks
 
-dbTaskToDomainTask :: DbTask -> DModels.Task
+dbTaskToDomainTask :: DbTask -> Task
 dbTaskToDomainTask dbTask =
-  DModels.Task
-    { taskId = DModels.TaskId (_dbTaskId dbTask),
+  Task
+    { taskId = TaskId (_dbTaskId dbTask),
       taskName = _dbTaskName dbTask,
       taskOwner = _dbTaskOwner dbTask,
       taskCompleted = _dbTaskCompleted dbTask
