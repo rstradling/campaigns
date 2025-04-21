@@ -6,13 +6,14 @@ module Feature.Task.Http
   )
 where
 
+import Feature.Task.PG
 import Feature.Task.Service
 import Feature.Task.Types
 import Servant (Get, Handler, JSON, Server, (:>))
 
 type TaskAPI = "api" :> "v1" :> "tasks" :> Get '[JSON] [Task]
 
-server :: (TaskService Handler) => Server TaskAPI
+server :: (TaskRepo Handler) => Server TaskAPI
 server = getAll
 
 --  get "/api/v1/tasks/:id" $ do
