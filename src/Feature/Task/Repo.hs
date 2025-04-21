@@ -10,7 +10,7 @@
 {-# LANGUAGE TypeFamilies #-}
 {-# LANGUAGE UndecidableInstances #-}
 
-module Feature.Task.PG where
+module Feature.Task.Repo where
 
 import Data.Pool (withResource)
 import Database.Beam

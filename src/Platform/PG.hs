@@ -11,7 +11,11 @@ init = acquirePool
 
 acquirePool :: Text -> IO (Pool Connection)
 acquirePool conStr =
-  liftIO $ newPool $ defaultPoolConfig (connectPostgreSQL $ encodeUtf8 $ conStr) close 60 10
+  liftIO $ newPool finalConfig
+  where
+    config = defaultPoolConfig (connectPostgreSQL $ encodeUtf8 conStr) close 60 10
+    stripes = Just 2
+    finalConfig = setNumStripes stripes $ config
 
 {-migrateDb :: Pool Connection -> IO ()
 migrateDb pool = withResource pool $ \conn ->

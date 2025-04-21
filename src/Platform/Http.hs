@@ -1,6 +1,6 @@
 module Platform.Http (runServer) where
 
-import qualified Feature.Task.Http as Task
+import qualified Feature.Task.Api as TaskApi
 import Feature.Task.Types (AppEnv (..))
 import Network.Wai (Application)
 import Network.Wai.Handler.Warp (run)
@@ -16,8 +16,8 @@ app env =
   logStdoutDev
     . simpleCors
     $ serve
-      (Proxy :: Proxy Task.TaskAPI)
-      (hoistServer (Proxy :: Proxy Task.TaskAPI) (rioToHandler env) Task.server)
+      (Proxy :: Proxy TaskApi.API)
+      (hoistServer (Proxy :: Proxy TaskApi.API) (rioToHandler env) TaskApi.server)
 
 rioToHandler :: AppEnv -> RIO AppEnv a -> Handler a
 rioToHandler env rio = liftIO (runRIO env rio)
@@ -28,4 +28,4 @@ runServer config = do
   let conStr = appPgSqlUrl config
   pool <- PG.init conStr
   let env = AppEnv pool
-  run 8080 (app env)
+  run port (app env)

@@ -1,13 +1,12 @@
 {-# LANGUAGE ConstraintKinds #-}
 {-# LANGUAGE DerivingStrategies #-}
 {-# LANGUAGE FlexibleContexts #-}
-{-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE UndecidableInstances #-}
 
 module Feature.Task.Service where
 
-import qualified Feature.Task.PG as TaskRepository
+import qualified Feature.Task.Repo as TaskRepo
 import Feature.Task.Types
 import RIO
 
@@ -24,7 +23,7 @@ class TaskService m where
 instance TaskService (RIO AppEnv) where
   -- getTask i = TaskServiceT $ TaskRepository.runTaskRepoT $ TaskRepository.getTask i
   -- deleteTask i = TaskServiceT $ TaskRepository.runTaskRepoT $ TaskRepository.deleteTask i
-  getAll = TaskRepository.getAllTasks
+  getAll = TaskRepo.getAllTasks
 
 -- update t = TaskServiceT $ TaskRepository.runTaskRepoT $ TaskRepository.updateTask t
 -- create t = TaskServiceT $ TaskRepository.runTaskRepoT $ TaskRepository.createTask t
