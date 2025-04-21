@@ -13,7 +13,7 @@ import Servant (Get, Handler, JSON, Server, (:>))
 
 type TaskAPI = "api" :> "v1" :> "tasks" :> Get '[JSON] [Task]
 
-server :: (TaskRepo Handler) => Server TaskAPI
+server :: Server TaskAPI
 server = getAll
 
 --  get "/api/v1/tasks/:id" $ do
