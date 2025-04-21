@@ -33,8 +33,8 @@ data AppEnv = AppEnv
 
 type AppM = RIO AppEnv
 
-class HasPgConn env where
+class HasPgPool env where
   pgPoolL :: Lens' env (Pool Connection)
 
-instance HasPgConn AppEnv where
+instance HasPgPool AppEnv where
   pgPoolL = lens _pgPool (\x v -> x {_pgPool = v})

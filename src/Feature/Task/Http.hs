@@ -6,16 +6,14 @@ module Feature.Task.Http
   )
 where
 
-import Data.Pool (Pool)
-import Database.Beam.Postgres (Connection)
 import Feature.Task.Service
 import Feature.Task.Types
 import Servant (Get, Handler, JSON, Server, (:>))
 
 type TaskAPI = "api" :> "v1" :> "tasks" :> Get '[JSON] [Task]
 
-server :: (TaskService m) => Server TaskAPI Handler
-server pool = getAll
+server :: (TaskService Handler) => Server TaskAPI
+server = getAll
 
 --  get "/api/v1/tasks/:id" $ do
 --    identifier <- pathParam "id"

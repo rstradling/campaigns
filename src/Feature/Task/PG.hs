@@ -12,11 +12,11 @@
 
 module Feature.Task.PG where
 
-import Data.Pool
+import Data.Pool (withResource)
 import Database.Beam
 import Database.Beam.Postgres
 import Feature.Task.Types
-import RIO (Bool, Eq, Int64, Monad, RIO, Show, Text, asks, map, pure, ($), (.))
+import RIO
 
 data DbTaskT f
   = DbTaskT
@@ -57,7 +57,7 @@ class (Monad m) => TaskRepo m where
 -- updateTask :: Task -> m (Maybe Task)
 -- createTask :: Task -> m (Maybe Task)
 
-instance (HasPgConn env) => TaskRepo (RIO env) where
+instance (HasPgPool env) => TaskRepo (RIO env) where
   {-getTask taskIdentifier = TaskRepoT $ do
     (pool, _) <- ask
     let id64 = getTaskId taskIdentifier
@@ -74,10 +74,10 @@ instance (HasPgConn env) => TaskRepo (RIO env) where
     -}
 
   getAllTasks = do
-    pool <- asks pgPoolL
-    dbTasks <- liftIO $ withResource pool $ \conn ->
+    poolCon <- view pgPoolL
+    dbTasks <- liftIO $ withResource poolCon $ \conn ->
       runBeamPostgres conn $ runSelectReturningList $ select $ all_ (_campaignTasks campaignsDb)
-    pure $ map dbTaskToDomainTask dbTasks
+    pure $ dbTaskToDomainTask <$> dbTasks
 
 dbTaskToDomainTask :: DbTask -> Task
 dbTaskToDomainTask dbTask =

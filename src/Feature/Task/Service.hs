@@ -7,23 +7,21 @@
 
 module Feature.Task.Service where
 
-import Data.Pool (Pool)
-import Database.Beam.Postgres (Connection)
 import qualified Feature.Task.PG as TaskRepository
 import Feature.Task.Types
-import RIO (IO)
+import RIO
 
 -- * Task
 
 class (Monad m) => TaskService m where
   -- getTask :: Int64 -> m (Maybe Task)
   -- deleteTask :: Int64 -> m (Maybe ())
-  getAll :: Pool Connection -> m [Task]
+  getAll :: m [Task]
 
 -- update :: Task -> m (Maybe Task)
 -- create :: Task -> m (Maybe Task)
 
-instance (TaskRepo m) => TaskService m where
+instance (Monad m, TaskRepository.TaskRepo m) => TaskService m where
   -- getTask i = TaskServiceT $ TaskRepository.runTaskRepoT $ TaskRepository.getTask i
   -- deleteTask i = TaskServiceT $ TaskRepository.runTaskRepoT $ TaskRepository.deleteTask i
   getAll = TaskRepository.getAllTasks
