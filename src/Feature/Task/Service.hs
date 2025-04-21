@@ -1,34 +1,32 @@
+{-# LANGUAGE ConstraintKinds #-}
+{-# LANGUAGE DerivingStrategies #-}
+{-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE UndecidableInstances #-}
+
 module Feature.Task.Service where
 
+import Data.Pool (Pool)
+import Database.Beam.Postgres (Connection)
+import qualified Feature.Task.PG as TaskRepository
 import Feature.Task.Types
-import RIO
+import RIO (IO)
 
 -- * Task
 
-class (MonadUnliftIO m) => TaskRepo m where
-  getTask :: Int64 -> m (Maybe Task)
-  deleteTask :: Int64 -> m (Maybe ())
-  getAll :: m [Task]
-  update :: Task -> m (Maybe Task)
-  create :: Task -> m (Maybe Task)
+class (Monad m) => TaskService m where
+  -- getTask :: Int64 -> m (Maybe Task)
+  -- deleteTask :: Int64 -> m (Maybe ())
+  getAll :: Pool Connection -> m [Task]
 
-getATask :: (Monad m) => Int64 -> m (Maybe Task)
-getATask _ =
-  return Nothing
+-- update :: Task -> m (Maybe Task)
+-- create :: Task -> m (Maybe Task)
 
-deleteATask :: (Monad m) => Int64 -> m (Maybe ())
-deleteATask _ =
-  return Nothing
+instance (TaskRepo m) => TaskService m where
+  -- getTask i = TaskServiceT $ TaskRepository.runTaskRepoT $ TaskRepository.getTask i
+  -- deleteTask i = TaskServiceT $ TaskRepository.runTaskRepoT $ TaskRepository.deleteTask i
+  getAll = TaskRepository.getAllTasks
 
-getAnAll :: (Monad m) => m [Task]
-getAnAll =
-  return
-    []
-
-updateTask :: (Monad m) => Task -> m (Maybe Task)
-updateTask _ =
-  return Nothing
-
-createTask :: (Monad m) => Task -> m (Maybe Task)
-createTask _ =
-  return Nothing
+-- update t = TaskServiceT $ TaskRepository.runTaskRepoT $ TaskRepository.updateTask t
+-- create t = TaskServiceT $ TaskRepository.runTaskRepoT $ TaskRepository.createTask t

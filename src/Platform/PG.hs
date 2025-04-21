@@ -1,24 +1,19 @@
 module Platform.PG where
 
--- import Data.Pool
--- import Database.Beam.Postgres (Connection, connectPostgreSQL)
--- import RIO
+import Data.Pool
+import Database.Beam.Postgres (Connection, close, connectPostgreSQL)
+import RIO
 
--- type Env = Pool Connection
+init :: Text -> IO (Pool Connection)
+init = acquirePool
 
-{- TODO: FIX ME init :: IO Env
-init = do
-  pool <- acquirePool
-  migrateDb pool
-  return pool
+--  migrateDb pool
 
-acquirePool :: IO (Pool Connection)
-acquirePool = do
-  envUrl <- lookupEnv "DATABASE_URL"
-  let pgUrl = fromString $ fromMaybe "postgresql://postgres:postgres@127.0.0.1:30432/campaigns_local" envUrl
-  createPool (connectPostgresSQL pgUrl) close 1 10 10
+acquirePool :: Text -> IO (Pool Connection)
+acquirePool conStr =
+  liftIO $ newPool $ defaultPoolConfig (connectPostgreSQL $ encodeUtf8 $ conStr) close 60 10
 
-migrateDb :: Pool Connection -> IO ()
+{-migrateDb :: Pool Connection -> IO ()
 migrateDb pool = withResource pool $ \conn ->
   void $ withTransaction conn (runMigration (ctx conn))
   where

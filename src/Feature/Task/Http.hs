@@ -1,30 +1,32 @@
+{-# LANGUAGE TypeOperators #-}
+
 module Feature.Task.Http
-  ( routes,
+  ( TaskAPI,
+    server,
   )
 where
 
-import Data.Aeson (object, (.=))
+import Data.Pool (Pool)
+import Database.Beam.Postgres (Connection)
+import Feature.Task.Service
 import Feature.Task.Types
-import Network.HTTP.Types.Status
-import Platform.Services
-import RIO
-import Web.Scotty.Trans
+import Servant (Get, Handler, JSON, Server, (:>))
 
-routes :: (Service m, MonadUnliftIO m) => ScottyT m ()
-routes = do
-  get "/api/v1/tasks/:id" $ do
-    identifier <- pathParam "id"
-    task <- lift $ getTask identifier
-    viewTask task
-  get "/api/v1/tasks/" $ do
-    tasks <- lift getAll
-    json tasks
+type TaskAPI = "api" :> "v1" :> "tasks" :> Get '[JSON] [Task]
 
-viewTask :: (MonadUnliftIO m) => Maybe Task -> ActionT m ()
-viewTask Nothing = do
-  status status404
-  json $ object ["error" .= ("Task not found" :: String)]
-viewTask (Just task) = json task
+server :: (TaskService m) => Server TaskAPI Handler
+server pool = getAll
+
+--  get "/api/v1/tasks/:id" $ do
+--    identifier <- pathParam "id"
+--    task <- lift $ getTask identifier
+--    viewTask task
+
+-- viewTask :: (MonadUnliftIO m) => Maybe Task -> ActionT Text m ()
+-- viewTask Nothing = do
+--  status status404
+--  json $ object ["error" .= ("Task not found" :: String)]
+-- viewTask (Just task) = json task
 
 {-taskErrorHandler :: (ScottyError e, Monad m) => TaskError -> ActionT e m ()
 taskErrorHandler = case err of

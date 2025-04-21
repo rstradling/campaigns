@@ -47,14 +47,14 @@ library:
   - http-types
   - mono-traversable
   - resource-pool
-  - scotty
   - text
   - time
+  - template-haskell
   - wai
   - wai-cors
   - wai-extra
   - warp
-  - template-haskell
+  - servant-server
   ghc-options:
   - -Wall
   - -Werror

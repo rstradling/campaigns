@@ -1,19 +1,22 @@
+{-# LANGUAGE ConstraintKinds #-}
 {-# LANGUAGE DeriveAnyClass #-}
+{-# LANGUAGE DerivingStrategies #-}
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE FlexibleInstances #-}
-{-# LANGUAGE FunctionalDependencies #-}
 {-# LANGUAGE GADTs #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE StandaloneDeriving #-}
-{-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE TypeFamilies #-}
+{-# LANGUAGE UndecidableInstances #-}
 
 module Feature.Task.PG where
 
+import Data.Pool
 import Database.Beam
 import Database.Beam.Postgres
 import Feature.Task.Types
-import RIO
+import RIO (Bool, Eq, Int64, Monad, RIO, Show, Text, asks, map, pure, ($), (.))
 
 data DbTaskT f
   = DbTaskT
@@ -46,34 +49,35 @@ deriving instance Database be CampaignsDb
 campaignsDb :: DatabaseSettings be CampaignsDb
 campaignsDb = defaultDbSettings
 
-repoSave :: Connection -> Task -> IO ()
-repoSave _ _ =
-  return ()
+class (Monad m) => TaskRepo m where
+  -- getTask :: Int64 -> m (Maybe Task)
+  -- deleteTask :: Int64 -> m (Maybe ())
+  getAllTasks :: m [Task]
 
-repoGet :: Connection -> TaskId -> IO (Maybe Task)
-repoGet con taskIdentifier =
-  let id64 = getTaskId taskIdentifier
-   in do
-        result <- runBeamPostgres con $ runSelectReturningList $ select $ do
-          task <- all_ (_campaignTasks campaignsDb)
-          guard_ (_dbTaskId task ==. val_ id64)
-          return task
-        return $ case result of
-          (dbTask : _) -> Just $ dbTaskToDomainTask dbTask
-          [] -> Nothing
+-- updateTask :: Task -> m (Maybe Task)
+-- createTask :: Task -> m (Maybe Task)
 
-repoDelete :: Connection -> Proxy Task -> TaskId -> IO (Maybe ())
-repoDelete _ _ _ =
-  return Nothing
+instance (HasPgConn env) => TaskRepo (RIO env) where
+  {-getTask taskIdentifier = TaskRepoT $ do
+    (pool, _) <- ask
+    let id64 = getTaskId taskIdentifier
+    result <- runBeamPostgres con $ runSelectReturningList $ select $ do
+      task <- all_ (_campaignTasks campaignsDb)
+      guard_
+        (_dbTaskId task ==. val_ id64)
+        return
+        task
+      return $ case result of
+        (dbTask : _) -> Just $ dbTaskToDomainTask dbTask
+        [] -> Nothing
+    return result
+    -}
 
-repoUpdate :: Connection -> Task -> IO ()
-repoUpdate _ _ =
-  return ()
-
-repoGetAll :: Connection -> IO [Task]
-repoGetAll conn = do
-  dbTasks <- runBeamPostgres conn $ runSelectReturningList $ select $ all_ (_campaignTasks campaignsDb)
-  return $ map dbTaskToDomainTask dbTasks
+  getAllTasks = do
+    pool <- asks pgPoolL
+    dbTasks <- liftIO $ withResource pool $ \conn ->
+      runBeamPostgres conn $ runSelectReturningList $ select $ all_ (_campaignTasks campaignsDb)
+    pure $ map dbTaskToDomainTask dbTasks
 
 dbTaskToDomainTask :: DbTask -> Task
 dbTaskToDomainTask dbTask =
