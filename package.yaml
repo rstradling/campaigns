@@ -19,48 +19,48 @@ extra-source-files:
 # common to point users to the README.md file.
 description:         Please see the README on GitHub at <https://github.com/githubuser/campaigns#readme>
 
+default-extensions:
+- OverloadedStrings
+- QuasiQuotes
+- ConstraintKinds
+- FlexibleContexts
+- TemplateHaskell
+- FlexibleInstances
+- NoImplicitPrelude
+- ScopedTypeVariables
+- DeriveGeneric
+- DataKinds
+- TypeApplications
 
 dependencies:
 - base >= 4.7 && < 5
-- aeson
-- beam-core
-- beam-postgres
-- bytestring
-- http-types
-- scotty
 - rio
-- text
-- time
-- wai
-- warp
-
-ghc-options:
-- -Wall
-- -Wcompat
-- -Widentities
-- -Wincomplete-record-updates
-- -Wincomplete-uni-patterns
-- -Wmissing-export-lists
-- -Wmissing-home-modules
-- -Wpartial-fields
-- -Wredundant-constraints
 
 library:
   source-dirs: src
-  other-modules: 
-  - Domain.Models
-  - Domain.Ports
-  exposed-modules:
-  - Adapters.TaskRepository
-  - Lib
-
-  default-extensions:
-  - NoImplicitPrelude
-  - OverloadedStrings
-  - DeriveGeneric
-  - DataKinds
-  - TypeApplications
-
+  dependencies:
+  - aeson
+  - beam-core
+  - beam-postgres
+  - bytestring
+  - conferer
+  - http-types
+  - mono-traversable
+  - resource-pool
+  - text
+  - time
+  - template-haskell
+  - wai
+  - wai-cors
+  - wai-extra
+  - warp
+  - servant-server
+  ghc-options:
+  - -Wall
+  - -Werror
+  - -Wincomplete-record-updates
+  - -Wincomplete-uni-patterns
+  - -Wredundant-constraints
 
 executables:
   campaigns-exe:
@@ -71,7 +71,6 @@ executables:
     - -rtsopts
     - -with-rtsopts=-N
     dependencies:
-    - base
     - campaigns
 
 tests:
@@ -83,7 +82,6 @@ tests:
     - -rtsopts
     - -with-rtsopts=-N
     dependencies:
-    - base
     - campaigns
     - hspec
     - hspec-wai

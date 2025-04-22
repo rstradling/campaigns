@@ -43,7 +43,7 @@ extra-deps:
   - beam-core-0.10.3.1
   #- beam-migrate-0.5.3.1
   - beam-postgres-0.5.4.2
-  - scotty-0.22
+  - etc-0.4.1.0
   #- text-2.0.2
 
 # Override default flag values for project packages and extra-deps
