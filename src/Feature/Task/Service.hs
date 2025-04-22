@@ -13,17 +13,17 @@ import RIO
 -- * Task
 
 class TaskService m where
-  -- getTask :: Int64 -> m (Maybe Task)
-  -- deleteTask :: Int64 -> m (Maybe ())
+  getTask :: TaskId -> m (Maybe Task)
+  deleteTask :: TaskId -> m (Maybe ())
   getAll :: m [Task]
-
--- update :: Task -> m (Maybe Task)
--- create :: Task -> m (Maybe Task)
+  update :: Task -> m (Maybe Task)
+  create :: Task -> m (Maybe Task)
 
 instance TaskService (RIO AppEnv) where
-  -- getTask i = TaskServiceT $ TaskRepository.runTaskRepoT $ TaskRepository.getTask i
-  -- deleteTask i = TaskServiceT $ TaskRepository.runTaskRepoT $ TaskRepository.deleteTask i
+  getTask i = TaskRepo.getTask i
+
+  deleteTask i = TaskRepo.deleteTask i
   getAll = TaskRepo.getAllTasks
 
--- update t = TaskServiceT $ TaskRepository.runTaskRepoT $ TaskRepository.updateTask t
--- create t = TaskServiceT $ TaskRepository.runTaskRepoT $ TaskRepository.createTask t
+  update t = TaskRepo.updateTask t
+  create t = TaskRepo.createTask t

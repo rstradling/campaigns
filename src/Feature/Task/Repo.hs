@@ -50,28 +50,32 @@ campaignsDb :: DatabaseSettings be CampaignsDb
 campaignsDb = defaultDbSettings
 
 class (Monad m) => TaskRepo m where
-  -- getTask :: Int64 -> m (Maybe Task)
-  -- deleteTask :: Int64 -> m (Maybe ())
+  getTask :: TaskId -> m (Maybe Task)
+  deleteTask :: TaskId -> m (Maybe ())
   getAllTasks :: m [Task]
-
--- updateTask :: Task -> m (Maybe Task)
--- createTask :: Task -> m (Maybe Task)
+  updateTask :: Task -> m (Maybe Task)
+  createTask :: Task -> m (Maybe Task)
 
 instance (HasPgPool env) => TaskRepo (RIO env) where
-  {-getTask taskIdentifier = TaskRepoT $ do
-    (pool, _) <- ask
-    let id64 = getTaskId taskIdentifier
-    result <- runBeamPostgres con $ runSelectReturningList $ select $ do
-      task <- all_ (_campaignTasks campaignsDb)
-      guard_
-        (_dbTaskId task ==. val_ id64)
-        return
-        task
-      return $ case result of
-        (dbTask : _) -> Just $ dbTaskToDomainTask dbTask
-        [] -> Nothing
-    return result
-    -}
+  deleteTask _ =
+    pure Nothing
+  createTask _ =
+    pure Nothing
+  updateTask _ =
+    pure Nothing
+  getTask i = do
+    poolCon <- view pgPoolL
+    let id64 = getTaskId i
+    result <- liftIO $ withResource poolCon $ \con ->
+      runBeamPostgres con $
+        runSelectReturningList $
+          select $ do
+            task <- all_ (_campaignTasks campaignsDb)
+            guard_ (_dbTaskId task ==. val_ id64)
+            pure task
+    return $ case result of
+      (dbTask : _) -> Just $ dbTaskToDomainTask dbTask
+      [] -> Nothing
 
   getAllTasks = do
     poolCon <- view pgPoolL
