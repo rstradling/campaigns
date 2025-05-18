@@ -3,13 +3,13 @@ module Lib
   )
 where
 
-import Conferer
 import qualified Platform.AppServer as App
 import Platform.Config
 import RIO
+import System.IO
 
 main :: IO ()
 main = do
   config <- mkMyConfig
-  appConfig :: AppConfig <- Conferer.fetch config
-  App.runServer appConfig
+  _ <- putStrLn $ show config
+  App.runServer config

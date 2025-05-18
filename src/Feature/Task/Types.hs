@@ -3,8 +3,6 @@
 module Feature.Task.Types where
 
 import Data.Aeson
-import Data.Pool
-import Database.Beam.Postgres (Connection)
 import RIO
 import qualified RIO.Text as Text
 import Servant (FromHttpApiData (..), ToHttpApiData (..))
@@ -33,18 +31,6 @@ data Task = Task
   deriving (Eq, Show, Generic, ToJSON, FromJSON)
 
 data TaskError = TaskErrorNotFound TaskId deriving (Eq, Show, Generic, ToJSON, FromJSON)
-
-data AppEnv = AppEnv
-  { _pgPool :: Pool Connection
-  }
-
-type AppM = RIO AppEnv
-
-class HasPgPool env where
-  pgPoolL :: Lens' env (Pool Connection)
-
-instance HasPgPool AppEnv where
-  pgPoolL = lens _pgPool (\x v -> x {_pgPool = v})
 
 data TaskHttpError = NotFound TaskId deriving (Typeable)
 

@@ -6,6 +6,7 @@
 
 module Feature.Task.Service where
 
+import Feature.Common.Types (AppEnv)
 import qualified Feature.Task.Repo as TaskRepo
 import Feature.Task.Types
 import RIO
