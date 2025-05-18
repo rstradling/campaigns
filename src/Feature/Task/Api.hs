@@ -6,6 +6,7 @@ module Feature.Task.Api
   )
 where
 
+import Feature.Common.Types (AppEnv)
 import Feature.Task.Repo (TaskRepo (getAllTasks))
 import Feature.Task.Service
 import Feature.Task.Types

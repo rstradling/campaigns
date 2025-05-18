@@ -15,6 +15,7 @@ module Feature.Task.Repo where
 import Data.Pool (withResource)
 import Database.Beam
 import Database.Beam.Postgres
+import Feature.Common.Types (HasPgPool, pgPoolL)
 import Feature.Task.Types
 import RIO
 
@@ -67,12 +68,13 @@ instance (HasPgPool env) => TaskRepo (RIO env) where
     poolCon <- view pgPoolL
     let id64 = getTaskId i
     result <- liftIO $ withResource poolCon $ \con ->
-      runBeamPostgres con $
-        runSelectReturningList $
-          select $ do
-            task <- all_ (_campaignTasks campaignsDb)
-            guard_ (_dbTaskId task ==. val_ id64)
-            pure task
+      runBeamPostgres con
+        $ runSelectReturningList
+        $ select
+        $ do
+          task <- all_ (_campaignTasks campaignsDb)
+          guard_ (_dbTaskId task ==. val_ id64)
+          pure task
     return $ case result of
       (dbTask : _) -> Just $ dbTaskToDomainTask dbTask
       [] -> Nothing
